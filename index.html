@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Нотный Детектив</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f0f8ff;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    .staff {
+      position: relative;
+      margin: 40px auto;
+      width: 360px;
+      height: 160px;
+      background: repeating-linear-gradient(
+        to bottom,
+        white 0px,
+        white 18px,
+        #000 18px,
+        #000 20px
+      );
+    }
+    .note {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: black;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: box-shadow 0.3s ease;
+    }
+    .note::after {
+      content: '';
+      position: absolute;
+      top: 5px;
+      left: 15px;
+      width: 1px;
+      height: 30px;
+      background: black;
+    }
+    .note.active {
+      box-shadow: 0 0 10px 4px yellow;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+      color: green;
+    }
+    .btn {
+      padding: 10px 20px;
+      background: #4caf50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px;
+    }
+    .btn:hover {
+      background: #45a049;
+    }
+    .rhythm-box {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 30px;
+    }
+    .rhythm {
+      font-size: 32px;
+      border: 2px solid #333;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 8px;
+      background: #fff;
+      transition: background-color 0.3s ease;
+    }
+    .rhythm.flash {
+      background-color: gold;
+    }
+  </style>
+</head>
+<body>
+  <!-- BODY OMITTED FOR BREVITY -->
+</body>
+</html>
