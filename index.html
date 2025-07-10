@@ -86,6 +86,128 @@
   </style>
 </head>
 <body>
-  <!-- BODY OMITTED FOR BREVITY -->
+  <h1>Игра "Нотный Детектив"</h1>
+  <p>Нажми на ноту, чтобы угадать, как она называется!</p>
+  <div class="staff" id="staff">
+    <div class="note" style="left: 20px; top: 110px" data-note="До"></div>
+    <div class="note" style="left: 60px; top: 95px" data-note="Ре"></div>
+    <div class="note" style="left: 100px; top: 80px" data-note="Ми"></div>
+    <div class="note" style="left: 140px; top: 70px" data-note="Фа"></div>
+    <div class="note" style="left: 180px; top: 55px" data-note="Соль"></div>
+    <div class="note" style="left: 220px; top: 40px" data-note="Ля"></div>
+    <div class="note" style="left: 260px; top: 25px" data-note="Си"></div>
+    <div class="note" style="left: 300px; top: 10px" data-note="До2"></div>
+  </div>
+  <button class="btn" onclick="promptNote()">Какую ноту найти?</button>
+  <div id="result"></div>
+
+  <h2>Часть 2: Почувствуй ритм!</h2>
+  <p>Нажми на карточку, чтобы услышать ритм (если выбрана правильная нота):</p>
+  <div class="rhythm-box">
+    <div class="rhythm" onclick="playNoteWithRhythm('whole', this, 1)">○</div>
+    <div class="rhythm" onclick="playNoteWithRhythm('half', this, 2)">●</div>
+    <div class="rhythm" onclick="playNoteWithRhythm('quarter', this, 4)">●́</div>
+    <div class="rhythm" onclick="playNoteWithRhythm('eighth', this, 8)">●́́</div>
+  </div>
+
+  <script>
+    let currentTarget = null;
+    let lastCorrectNote = null;
+
+    const noteSounds = {
+      "До": "https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/acoustic_grand_piano-mp3/C4.mp3",
+      "Ре": "https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/acoustic_grand_piano-mp3/D4.mp3",
+      "Ми": "https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/acoustic_grand_piano-mp3/E4.mp3",
+      "Фа": "https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/acoustic_grand_piano-mp3/F4.mp3",
+      "Соль": "https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/acoustic_grand_piano-mp3/G4.mp3",
+      "Ля": "https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/acoustic_grand_piano-mp3/A4.mp3",
+      "Си": "https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/acoustic_grand_piano-mp3/B4.mp3",
+      "До2": "https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@master/FluidR3_GM/acoustic_grand_piano-mp3/C5.mp3"
+    };
+
+    const speechMap = {
+      "До": "Это До",
+      "Ре": "Это Ре",
+      "Ми": "Это Ми",
+      "Фа": "Это Фа",
+      "Соль": "Это Соль",
+      "Ля": "Это Ля",
+      "Си": "Это Си",
+      "До2": "Это До"
+    };
+
+    function speak(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "ru-RU";
+      speechSynthesis.speak(utterance);
+    }
+
+    function promptNote() {
+      const notes = Object.keys(noteSounds);
+      currentTarget = notes[Math.floor(Math.random() * notes.length)];
+      document.getElementById("result").textContent = `Найди ноту: ${currentTarget}`;
+    }
+
+    document.querySelectorAll(".note").forEach(note => {
+      note.addEventListener("click", () => {
+        const selected = note.dataset.note;
+        if (selected === currentTarget) {
+          document.getElementById("result").textContent = "Правильно! Это " + selected + "! ✅";
+          currentTarget = null;
+          lastCorrectNote = selected;
+          if (speechMap[selected]) {
+  setTimeout(() => speak(speechMap[selected]), 1000); // задержка 1 секунда
+}
+        } else {
+          document.getElementById("result").textContent = "Неправильно. Попробуй ещё раз! ❌";
+        }
+        if (noteSounds[selected]) {
+          playSound(noteSounds[selected]);
+        }
+      });
+    });
+
+    function playSound(src) {
+      const audio = new Audio(src);
+      audio.play().catch(e => {
+        console.warn("Не удалось воспроизвести звук:", e);
+      });
+    }
+
+    function playNoteWithRhythm(type, element, repeatCount) {
+      if (!lastCorrectNote) {
+        alert("Сначала выбери правильную ноту!");
+        return;
+      }
+      const durationMap = {
+        whole: 2400,
+        half: 1200,
+        quarter: 600,
+        eighth: 300
+      };
+      const duration = durationMap[type];
+
+      // Подсветка кнопки ритма
+      element.classList.add("flash");
+      setTimeout(() => {
+        element.classList.remove("flash");
+      }, duration * repeatCount);
+
+      const src = noteSounds[lastCorrectNote];
+      const noteElement = [...document.querySelectorAll('.note')].find(n => n.dataset.note === lastCorrectNote);
+
+      let count = 0;
+      const playInterval = setInterval(() => {
+        const audio = new Audio(src);
+        audio.play().catch(e => console.warn("Не удалось воспроизвести ноту с ритмом:", e));
+        if (noteElement) {
+          noteElement.classList.add("active");
+          setTimeout(() => noteElement.classList.remove("active"), duration);
+        }
+        count++;
+        if (count >= repeatCount) clearInterval(playInterval);
+      }, duration);
+    }
+  </script>
 </body>
 </html>
